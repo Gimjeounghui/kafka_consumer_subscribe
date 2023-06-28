@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<!--
+displayKafkaData 함수를 사용하여 받아온 Kafka 데이터를 HTML 테이블에 표현
+fetchKafkaData 함수는 Kafka 데이터를 가져와서 displayKafkaData 함수호출
+아래코드는 kafka_data.json 파일을 GET 요청하여 Kafka 데이터를 가져오는 것을 가정
+실제로는 Kafka Consumer를 구현하고 데이터를 수신하는 방식에 따라 적절한 API 엔드포인트를 사용
+
+위 코드를 HTML 파일로 저장한 후 웹 브라우저에서 열면 Kafka에서 받아온 데이터가 테이블로 표시될 것입니다.
+필요에 따라 HTML 테이블의 구조와 스타일을 수정하여 원하는 형태로 데이터를 표현할 수 있습니다.
+
+-->
+<!DOCTYPE html>
+<!-- xmlns:th=" " : 타임리프의 th속성을 사용하기 위해 선언된 네임스페이스. 순수 HTML로 이루어진 페이지는 선언하지 않아도 됨  -->
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <!-- UTF-8 Encoding -->
+    <meta charset="UTF-8">
+    <title>타임리프 예제</title>
+</head>
+<body>
+    <h1>타임리프를 활용한 VO 값 표현</h1>
+
+    <!-- Controller에서 전달받은 데이터 접근 -->
+<!--
+    <div th:object="${vo}">
+        <p>name: <span th:text="*{id}"></span></p>
+        <p>lng: <span th:text="*{lng}"></span></p>
+        <p>lat: <span th:text="*{lat}"></span></p>
+    </div>
+-->
+</body>
+</html>

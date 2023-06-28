@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>3D Digital Twin(dot)</title>
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet">
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
+    <style>
+
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        #map {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 100%;
+        }
+
+        /* 표 스타일링 */
+        .table-wrapper {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            background-color: #ffffff;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 10px;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            color: #333333;
+        }
+
+        .table-wrapper table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table-wrapper th,
+        .table-wrapper td {
+            padding: 8px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .table-wrapper th {
+            background-color: #f5f5f5;
+            font-weight: bold;
+            text-align: left;
+        }
+
+        .table-wrapper td {
+            text-align: left;
+        }
+
+    </style>
+
+</head>
+<body>
+<div id="map"></div>
+<script>
+    // 생성한 mapbox tokens
+    mapboxgl.accessToken = 'pk.eyJ1IjoiZWFsaXllbCIsImEiOiJjbGl4c3lxamwwNWkzM2lxcXo2ZGMzeDB3In0.wk20DAA58iBB-7B1hd8wZA';
+
+    // mapbox 지도 생성
+    var map = new mapboxgl.Map ({
+
+        container: 'map',
+        style: 'mapbox://styles/mapbox/light-v11',
+        center: [127.05547800197033, 37.033850009891204],   // 지도의 중심 좌표
+        zoom: 12                                            // 지도의 줌 레벨
+    });
+
+    // 좌표 배열(DOT)
+    var points = [
+
+        { coordinates: [127.0557, 37.0382] }, // 삼성전자 평택 사업장
+        { coordinates: [127.0616, 37.0385] }, // 삼성전자 반도체 공장
+        { coordinates: [127.056, 37.0289]  }, // 삼성전자 고덕 현장 2GATE
+        { coordinates: [127.0649, 37.0304] }, // 삼성전자 고덕 현장 5GATE
+        { coordinates: [127.034, 37.0258]  }, // 평택고덕IC - 1
+        { coordinates: [127.034, 37.02659] }, // 평택고덕IC - 2
+        { coordinates: [127.034, 37.0260]  }, // 이름미정
+        { coordinates: [127.034, 37.0261]  }, // 이름미정
+        { coordinates: [127.039, 37.0249]  }, // 평택제천고속도로
+        { coordinates: [127.034, 37.0250]  }  // 이름미정
+
+    ];
+
+    map.on('load', function() {
+        // Source 생성
+        var geojson = {
+            type: 'FeatureCollection',
+            features: points.map(function(point) {
+                return {
+                    type: 'Feature',
+                    geometry: {
+                        type: 'Point',
+                        coordinates: point.coordinates
+                    }
+                };
+            })
+        };
+
+        // Source 추가
+        map.addSource('points', {
+            type: 'geojson',
+            data: geojson
+        });
+
+        // Layer 추가
+        map.addLayer ({
+            id: 'points',
+            type: 'circle',
+            source: 'points',
+            paint: {
+                'circle-radius': 6,
+                'circle-color': '#FF0000'
+            }
+        });
+    });
+
+    map.on('style.load', () => {
+        // Insert the layer beneath any symbol layer.
+        const layers = map.getStyle().layers;
+        const labelLayerId = layers.find(
+            (layer) => layer.type === 'symbol' && layer.layout['text-field']
+        ).id;
+
+        map.addLayer (
+
+            {
+                'id': 'add-3d-buildings',
+                'source': 'composite',
+                'source-layer': 'building',
+                'filter': ['==', 'extrude', 'true'],
+                'type': 'fill-extrusion',
+                'minzoom': 15,
+                'paint': {
+                    'fill-extrusion-color': '#aaa',
+
+                    'fill-extrusion-height': [
+                        'interpolate',
+                        ['linear'],
+                        ['zoom'],
+                        15,
+                        0,
+                        15.05,
+                        ['get', 'height']
+                    ],
+                    'fill-extrusion-base': [
+                        'interpolate',
+                        ['linear'],
+                        ['zoom'],
+                        15,
+                        0,
+                        15.05,
+                        ['get', 'min_height']
+                    ],
+                    'fill-extrusion-opacity': 0.6
+                }
+            },
+            labelLayerId
+        );
+    });
+
+</script>
+
+<div class="table-wrapper">
+    <table>
+        <tr>
+            <th>항목 1</th>
+            <th>항목 2</th>
+        </tr>
+        <tr>
+            <td>값 1</td>
+            <td>값 2</td>
+        </tr>
+        <tr>
+            <td>값 3</td>
+            <td>값 4</td>
+        </tr>
+        <tr>
+            <td>값 5</td>
+            <td>값 6</td>
+        </tr>
+    </table>
+</div>
+</body>
+</html>
